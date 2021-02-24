@@ -149,7 +149,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/golang/protobuf/jsonpb"
+	"google.golang.org/protobuf/encoding/protojson"
 	"github.com/go-chi/render"
 	"github.com/go-chi/chi"
 	{{ range $imports }}
@@ -239,13 +239,13 @@ func Register{{ .Name }}Web(r chi.Router, i {{ .Name }}Handler, middlewares ...f
 
 {{ range .AllMessages }}
 
-// {{ marshaler . }} describes the default jsonpb.Marshaler used by all
+// {{ marshaler . }} describes the default protojson.Marshaler used by all
 // instances of {{ name . }}. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var {{ marshaler . }} = new(jsonpb.Marshaler)
+var {{ marshaler . }} = new(protojson.Marshaler)
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
-// uses the more correct jsonpb package to correctly marshal the message.
+// uses the more correct protojson package to correctly marshal the message.
 func (m *{{ name . }}) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
@@ -262,13 +262,13 @@ func (m *{{ name . }}) MarshalJSON() ([]byte, error) {
 
 var _ json.Marshaler = (*{{ name . }})(nil)
 
-// {{ unmarshaler . }} describes the default jsonpb.Unmarshaler used by all
+// {{ unmarshaler . }} describes the default protojson.Unmarshaler used by all
 // instances of {{ name . }}. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var {{ unmarshaler . }} = new(jsonpb.Unmarshaler)
+var {{ unmarshaler . }} = new(protojson.Unmarshaler)
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
-// uses the more correct jsonpb package to correctly unmarshal the message.
+// uses the more correct protojson package to correctly unmarshal the message.
 func (m *{{ name . }}) UnmarshalJSON(b []byte) error {
 	return {{ unmarshaler . }}.Unmarshal(bytes.NewReader(b), m)
 }
